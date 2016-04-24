@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Music list</string>
+    <string name="main_acivity_title" type="id">Исполнители</string>
+    <string name="url">http://cache-default06d.cdn.yandex.net/download.cdn.yandex.net/mobilization-2016/artists.json</string>
+    <string name="no_intenet">No internet connection</string>
+    <string name="try_again">Try again</string>
+    <string name="biography">Biography</string>
+    <string name="filename">artists.json</string>
+    <string name="nothing_found">Nothing found</string>
+</resources>
