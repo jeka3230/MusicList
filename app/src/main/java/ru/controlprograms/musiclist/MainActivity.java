@@ -272,7 +272,7 @@ public class MainActivity extends ActionBarActivity {
                 mListView.setVisibility(View.VISIBLE);
             }
         });
-//          Обработка нажатия на кнопку назад на actiobar во время поиска.
+//          Обработка нажатия на кнопку назад на actionbar во время поиска.
         MenuItemCompat.setOnActionExpandListener(menu.findItem(R.id.search), new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
