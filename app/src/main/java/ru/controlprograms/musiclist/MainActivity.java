@@ -183,6 +183,8 @@ public class MainActivity extends ActionBarActivity {
                                 e.printStackTrace();
                             }
                         }
+                        mLoadingView.setVisibility(View.VISIBLE);
+                        mListView.setVisibility(View.VISIBLE);
                         mAdapter.setData(mFilteredArtists);
                     } else {
 //                        Если список пуст, показать сообщение пользователю.
