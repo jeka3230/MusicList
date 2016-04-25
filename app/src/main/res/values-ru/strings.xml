@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Список исполнителей</string>
+    <string name="app_name">Music List</string>
     <string name="main_acivity_title">Исполнители</string>
     <string name="no_intenet">При загрузке данных произошла ошибка.\n Проверьте ваше подключение к сети.</string>
     <string name="try_again">Повторить попытку</string>
