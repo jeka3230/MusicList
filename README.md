@@ -10,6 +10,8 @@
 #### Демонстрация работы программы:
 ![Демонстрация работы программы](https://github.com/jeka3230/MusicList/blob/master/extra%20files/animation.gif)
 
+## [Скачать apk](https://github.com/jeka3230/MusicList/blob/master/extra%20files/musiclist.apk)
+
 #### Реализованная функциональность:
 - Кэширование
 - Поиск по исполнителям
