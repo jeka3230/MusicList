@@ -34,7 +34,7 @@ public class MainActivity extends ActionBarActivity {
     private static final String NETWORK_STATE = "NETWORK_STATE";
     private String LIST_INSTANCE_STATE = "LIST_INSTANCE_STATE";
 
-    public String INTENT_VALUE = "artists";
+    public static String INTENT_VALUE = "artists";
     public String PENDING_INTENT_VALUE = "android.net.conn.CONNECTIVITY_CHANGE";
     //    Массив для информации обо всех исполнителях.
     private JSONArray mArtists = new JSONArray();

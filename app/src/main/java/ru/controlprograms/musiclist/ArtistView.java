@@ -20,7 +20,7 @@ public class ArtistView extends ActionBarActivity {
         setContentView(R.layout.activity_artist_view);
         try {
 //            Взять информации об артисет для отображения из строки, переданной интентом.
-            JSONObject jsonObject = new JSONObject(getIntent().getStringExtra("artist"));
+            JSONObject jsonObject = new JSONObject(getIntent().getStringExtra(MainActivity.INTENT_VALUE));
             GetFromJSON getFromJSON = new GetFromJSON(jsonObject);
             String name = getFromJSON.getName();
 //            Заполнить шаблон.
