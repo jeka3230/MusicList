@@ -1,5 +1,7 @@
 package ru.controlprograms.musiclist;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,6 +21,7 @@ public class GetFromJSON {
     private final String TRACKS = "tracks";
 
     JSONObject mJsonObject;
+
     public GetFromJSON(JSONObject jsonObject) {
         mJsonObject = jsonObject;
     }
@@ -56,7 +59,7 @@ public class GetFromJSON {
         return albums +" " + textAlbums + ", "+tracks +" " + textTracks;
     }
 // Обработка окончаний слов.
-    private static String wordForms(int number, String firstForm, String secondForm, String thirdForm) {
+    private String wordForms(int number, String firstForm, String secondForm, String thirdForm) {
 
         int lastDigit = number % 10;
         int penultDigit = number % 100 / 10;
