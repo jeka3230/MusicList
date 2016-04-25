@@ -13,9 +13,9 @@
 ## [Скачать apk](https://github.com/jeka3230/MusicList/blob/master/extra%20files/musiclist.apk)
 
 #### Реализованная функциональность:
-- Кэширование
-- Поиск по исполнителям
-- Анимация перехода между активностями
+- Кэширование.
+- Поиск по исполнителям.
+- Анимация перехода между активностями.
 
 #### Используемые библиотеки:
 - [Volley](https://android.googlesource.com/platform/frameworks/volley)
