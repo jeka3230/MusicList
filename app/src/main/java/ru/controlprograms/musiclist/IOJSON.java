@@ -16,7 +16,7 @@ public class IOJSON {
     public IOJSON(Context context) {
         mContext = context;
     }
-//    Считывание jsonarray с диска.
+//    Считывание jsonArray с диска.
     public String loadJSON() {
         String filename = mContext.getResources().getString(R.string.filename);
         File file = new File(mContext.getFilesDir() +"/"+filename);
