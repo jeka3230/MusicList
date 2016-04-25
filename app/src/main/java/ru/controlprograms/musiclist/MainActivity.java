@@ -32,12 +32,16 @@ import org.json.JSONException;
 public class MainActivity extends ActionBarActivity {
 
     private static final String NETWORK_STATE = "NETWORK_STATE";
-//    Массив для информации обо всех исполнителях.
+    private String LIST_INSTANCE_STATE = "LIST_INSTANCE_STATE";
+
+    public String INTENT_VALUE = "artists";
+    public String PENDING_INTENT_VALUE = "android.net.conn.CONNECTIVITY_CHANGE";
+    //    Массив для информации обо всех исполнителях.
     private JSONArray mArtists = new JSONArray();
 //    Массив для информации об исполнителях, удоавлетворяющих критерию поиска.
     private JSONArray mFilteredArtists = new JSONArray();
     private ListView mListView;
-    private String LIST_INSTANCE_STATE = "LIST_INSTANCE_STATE";
+
     private Parcelable mListInstanceState;
     private Boolean mNetworkState = false;
 //    База данных для поиска.
@@ -71,7 +75,7 @@ public class MainActivity extends ActionBarActivity {
                 }
                 mNetworkState = newNetworkState;
             }
-        },new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+        },new IntentFilter(PENDING_INTENT_VALUE));
 
         mIOJSON = new IOJSON(this);
 //        Попытаемся считать jsonarry с диска.
@@ -167,7 +171,7 @@ public class MainActivity extends ActionBarActivity {
 
                 Intent intent = new Intent(MainActivity.this, ArtistView.class);
                 try {
-                    intent.putExtra("artist", mFilteredArtists.getJSONObject(position).toString());
+                    intent.putExtra(INTENT_VALUE, mFilteredArtists.getJSONObject(position).toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
