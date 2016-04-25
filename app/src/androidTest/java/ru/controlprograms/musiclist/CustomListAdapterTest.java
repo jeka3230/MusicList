@@ -13,9 +13,6 @@ import org.json.JSONArray;
  */
 public class CustomListAdapterTest extends AndroidTestCase {
 
-
-
-    CustomListAdapter mAdapter;
     final String jsonString = "[{\"id\":1080505,\"name\":\"Tove Lo\",\"genres\":[\"pop\",\"dance\"," +
             "\"electronics\"],\"tracks\":81,\"albums\":22,\"link\":\"http://www.tove-lo.com/\"," +
             "\"description\":\"шведская певица и автор песен. Она привлекла к себе внимание в" +
@@ -35,12 +32,12 @@ public class CustomListAdapterTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         JSONArray jsonArray = new JSONArray(jsonString);
-        mAdapter = new CustomListAdapter(getContext(), jsonArray);
-        assertNotNull("Adapter is null",mAdapter);
-        assertEquals("Wrong Id",0, mAdapter.getItemId(0));
-        assertEquals("GetCount incorrect.", 1, mAdapter.getCount());
-        assertEquals("Wrong item", jsonArray.getJSONObject(0), mAdapter.getItem(0));
-        assertNotNull("View is null",mAdapter.getView(0, null, null));
+        CustomListAdapter adapter = new CustomListAdapter(getContext(), jsonArray);
+        assertNotNull("Adapter is null",adapter);
+        assertEquals("Wrong Id",0, adapter.getItemId(0));
+        assertEquals("GetCount incorrect.", 1, adapter.getCount());
+        assertEquals("Wrong item", jsonArray.getJSONObject(0), adapter.getItem(0));
+        assertNotNull("View is null",adapter.getView(0, null, null));
     }
 
 }
