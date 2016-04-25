@@ -20,6 +20,15 @@ public class GetFromJSON {
     private final String ALBUMS = "albums";
     private final String TRACKS = "tracks";
 
+    private final String ALBUM1 = "альбом";
+    private final String ALBUM2 = "альбома";
+    private final String ALBUM3 = "альбомов";
+
+    private final String TRACKS1 = "песня";
+    private final String TRACKS2 = "песни";
+    private final String TRACKS3 = "песен";
+
+
     JSONObject mJsonObject;
 
     public GetFromJSON(JSONObject jsonObject) {
@@ -53,15 +62,16 @@ public class GetFromJSON {
 
         int albums = mJsonObject.getInt(ALBUMS);
         int tracks = mJsonObject.getInt(TRACKS);
-        String textAlbums = wordForms(albums, "альбом", "альбома", "альбомов");
-        String textTracks = wordForms(tracks, "песня", "песни", "песен");
+        String textAlbums = wordForms(albums, ALBUM1, ALBUM2, ALBUM3);
+        String textTracks = wordForms(tracks, TRACKS1, TRACKS2, TRACKS3);
 
         return albums +" " + textAlbums + ", "+tracks +" " + textTracks;
     }
 // Обработка окончаний слов.
     private String wordForms(int number, String firstForm, String secondForm, String thirdForm) {
-
+//        Последняя цифра
         int lastDigit = number % 10;
+//        Предпоследняя цифра
         int penultDigit = number % 100 / 10;
 
         if (lastDigit == 1 && penultDigit !=1) {

@@ -12,6 +12,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -54,6 +55,7 @@ public class MainActivity extends ActionBarActivity {
     private IOJSON mIOJSON;
 //    Текстовое представление для демонстрации отсутствия результатов поиска.
     private TextView mTextNothing;
+    private BroadcastReceiver mReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +67,7 @@ public class MainActivity extends ActionBarActivity {
             actionBar.setTitle(activityName);
         }
 //        Поставим слушателя на состояние подключения к интернету.
-        registerReceiver(new BroadcastReceiver() {
+        mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Boolean newNetworkState = isNetworkConnected();
@@ -75,7 +77,8 @@ public class MainActivity extends ActionBarActivity {
                 }
                 mNetworkState = newNetworkState;
             }
-        },new IntentFilter(PENDING_INTENT_VALUE));
+        };
+        registerReceiver(mReceiver,new IntentFilter(PENDING_INTENT_VALUE));
 
         mIOJSON = new IOJSON(this);
 //        Попытаемся считать jsonarry с диска.
@@ -114,6 +117,117 @@ public class MainActivity extends ActionBarActivity {
             }
         }
 
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mReceiver);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+//        Сохранить состояние списка и интернета.
+        if (mNetworkState) {
+            savedInstanceState.putParcelable(LIST_INSTANCE_STATE, mListView.onSaveInstanceState());
+        }
+        savedInstanceState.putBoolean(NETWORK_STATE, mNetworkState);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+//        Востановить состояние списка.
+        if (savedInstanceState.getBoolean(NETWORK_STATE)) {
+            mListInstanceState = savedInstanceState.getParcelable(LIST_INSTANCE_STATE);
+            mListView.onRestoreInstanceState(mListInstanceState);
+        }
+    }
+
+    // Заполнение меню actionbar.
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        final SearchView searchView =
+                (SearchView) menu.findItem(R.id.search).getActionView();
+//        Изменение списка в зависимости от поискового запроса.
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                changeListData(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                changeListData(newText);
+                return true;
+            }
+
+            private void changeListData(String query) {
+                if (!query.isEmpty() && mListView != null) {
+                    mTextNothing.setVisibility(View.GONE);
+                    mListView.setVisibility(View.VISIBLE);
+//                    Сделать поисковый запрос.
+                    Cursor cursor = mDatabase.getWordMatches(query,null);
+                    mFilteredArtists = new JSONArray();
+//                    Если список выдачи не пуст, выбрать из массива нужные элементы и обновить список.
+                    int positon;
+                    if (cursor != null && mFilteredArtists !=null) {
+                        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                            positon = Integer.parseInt(cursor.getString(1));
+                            try {
+                                mFilteredArtists.put(mArtists.getJSONObject(positon));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        mAdapter.setData(mFilteredArtists);
+                    } else {
+//                        Если список пуст, показать сообщение пользователю.
+                        mTextNothing.setVisibility(View.VISIBLE);
+                        mListView.setVisibility(View.GONE);
+                    }
+                } else {
+//                    Если запрос пуст, вывести информацию обо всех.
+                    mFilteredArtists = mArtists;
+                    mAdapter.setData(mFilteredArtists);
+                }
+            }
+
+        });
+//        Кнопка ощищающая текст поискового запроса.
+        ImageView clearButton = (ImageView) searchView.findViewById(R.id.search_close_btn);
+//        Если кнопка нажата, очистить список и показать всех исполнителей.
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchView.setQuery("",false);
+                mFilteredArtists = mArtists;
+                mAdapter.setData(mFilteredArtists);
+                mTextNothing.setVisibility(View.GONE);
+                mListView.setVisibility(View.VISIBLE);
+            }
+        });
+//          Обработка нажатия на кнопку назад на actionbar во время поиска.
+        MenuItemCompat.setOnActionExpandListener(menu.findItem(R.id.search), new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+//                Если кнопка нажата, свернуть поисковый textedit и отобразить всех исполнителей.
+                mFilteredArtists = mArtists;
+                mAdapter.setData(mFilteredArtists);
+                mTextNothing.setVisibility(View.GONE);
+                mListView.setVisibility(View.VISIBLE);
+                return true;
+            }
+        });
+        return true;
     }
 
     private void fillMainActivity() {
@@ -183,25 +297,7 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-//        Сохранить состояние списка и интернета.
-        if (mNetworkState) {
-            savedInstanceState.putParcelable(LIST_INSTANCE_STATE, mListView.onSaveInstanceState());
-        }
-        savedInstanceState.putBoolean(NETWORK_STATE, mNetworkState);
-        super.onSaveInstanceState(savedInstanceState);
-    }
 
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-//        Востановить состояние списка.
-        if (savedInstanceState.getBoolean(NETWORK_STATE)) {
-            mListInstanceState = savedInstanceState.getParcelable(LIST_INSTANCE_STATE);
-            mListView.onRestoreInstanceState(mListInstanceState);
-        }
-    }
 
     private boolean isNetworkConnected() {
 //        Проверить наличие подключения к интернету.
@@ -209,90 +305,5 @@ public class MainActivity extends ActionBarActivity {
         return connectivityManager.getActiveNetworkInfo() != null;
     }
 
-// Заполнение меню actionbar.
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        final SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
-//        Изменение списка в зависимости от поискового запроса.
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                changeListData(query);
-                return true;
-            }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                changeListData(newText);
-                return true;
-            }
-
-            private void changeListData(String query) {
-                if (!query.isEmpty() && mListView != null) {
-                    mTextNothing.setVisibility(View.GONE);
-                    mListView.setVisibility(View.VISIBLE);
-//                    Сделать поисковый запрос.
-                    Cursor cursor = mDatabase.getWordMatches(query,null);
-                    mFilteredArtists = new JSONArray();
-                    int positon;
-//                    Если список выдачи не пуст, выбрать из массива нужные элементы и обновить список.
-                    if (cursor !=null) {
-                        while (cursor.moveToNext()) {
-                            positon = Integer.parseInt(cursor.getString(1));
-                            try {
-                                mFilteredArtists.put(mArtists.getJSONObject(positon));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        mAdapter.setData(mFilteredArtists);
-                    } else {
-//                        Если список пуст, показать сообщение пользователю.
-                        mTextNothing.setVisibility(View.VISIBLE);
-                        mListView.setVisibility(View.GONE);
-                    }
-
-                } else {
-//                    Если запрос пуст, вывести информацию обо всех.
-                    mFilteredArtists = mArtists;
-                    mAdapter.setData(mFilteredArtists);
-                }
-            }
-
-        });
-//        Кнопка ощищающая текст поискового запроса.
-        ImageView clearButton = (ImageView) searchView.findViewById(R.id.search_close_btn);
-//        Если кнопка нажата, очистить список и показать всех исполнителей.
-        clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchView.setQuery("",false);
-                mFilteredArtists = mArtists;
-                mAdapter.setData(mFilteredArtists);
-                mTextNothing.setVisibility(View.GONE);
-                mListView.setVisibility(View.VISIBLE);
-            }
-        });
-//          Обработка нажатия на кнопку назад на actionbar во время поиска.
-        MenuItemCompat.setOnActionExpandListener(menu.findItem(R.id.search), new MenuItemCompat.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-//                Если кнопка нажата, свернуть поисковый textedit и отобразить всех исполнителей.
-                mFilteredArtists = mArtists;
-                mAdapter.setData(mFilteredArtists);
-                mTextNothing.setVisibility(View.GONE);
-                mListView.setVisibility(View.VISIBLE);
-                return true;
-            }
-        });
-        return true;
-    }
 }

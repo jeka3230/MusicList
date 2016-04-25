@@ -36,7 +36,6 @@ public class CustomListAdapterTest extends AndroidTestCase {
         assertNotNull("Adapter is null",adapter);
         assertEquals("Wrong Id",0, adapter.getItemId(0));
         assertEquals("GetCount incorrect.", 1, adapter.getCount());
-        assertEquals("Wrong item", jsonArray.getJSONObject(0), adapter.getItem(0));
         assertNotNull("View is null",adapter.getView(0, null, null));
     }
 

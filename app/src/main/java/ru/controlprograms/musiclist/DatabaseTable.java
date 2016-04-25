@@ -54,7 +54,7 @@ public class DatabaseTable {
         public void onCreate(SQLiteDatabase db) {
             mDatabase = db;
             mDatabase.execSQL(FTS_TABLE_CREATE);
-//            При создании заполнить бд.
+//            Заполнить бд.
             loadDictionary();
 
         }
@@ -109,7 +109,7 @@ public class DatabaseTable {
 
     public Cursor getWordMatches(String query, String[] columns) {
 //        Выбрать все слова, начинающеися на "запрос".
-        String selection = COL_WORD + " MATCH ?";
+        String selection = COL_WORD + " MATCH ? ";
         String[] selectionArgs = new String[] {query+"*"};
         return query(selection, selectionArgs, columns);
     }
